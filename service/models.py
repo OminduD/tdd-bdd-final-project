@@ -13,34 +13,23 @@
 # limitations under the License.
 
 """
-Models for Product Demo Service
+Models for Product Service
 
 All of the models are stored in this module
-
-Models
-------
-Product - A Product used in the Product Store
-
-Attributes:
------------
-name (string) - the name of the product
-description (string) - the description the product belongs to (i.e., dog, cat)
-available (boolean) - True for products that are available for adoption
-
 """
 import logging
-from enum import Enum
 from decimal import Decimal
+from enum import Enum
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 
 logger = logging.getLogger("flask.app")
 
-# Create the SQLAlchemy object to be initialized later in init_db()
+# Create the SQLAlchemy object to be initialized later in init_db
 db = SQLAlchemy()
 
 
-def init_db(app):
+def init_db(app: Flask):
     """Initialize the SQLAlchemy app"""
     Product.init_db(app)
 
@@ -64,8 +53,8 @@ class Product(db.Model):
     """
     Class that represents a Product
 
-    This version uses a relational database for persistence which is hidden
-    from us by SQLAlchemy's object relational mappings (ORM)
+    This version uses a relational database for a hidden persistence
+    from us by SQLAlchemy's object-relational mappings (ORM)
     """
 
     ##################################################
@@ -81,9 +70,8 @@ class Product(db.Model):
     )
 
     ##################################################
-    # INSTANCE METHODS
+    # Instance Methods
     ##################################################
-
     def __repr__(self):
         return f"<Product {self.name} id=[{self.id}]>"
 
@@ -120,12 +108,13 @@ class Product(db.Model):
             "description": self.description,
             "price": str(self.price),
             "available": self.available,
-            "category": self.category.name  # convert enum to string
+            "category": self.category.name,  # convert enum to string
         }
 
     def deserialize(self, data: dict):
         """
         Deserializes a Product from a dictionary
+
         Args:
             data (dict): A dictionary containing the Product data
         """
@@ -152,16 +141,14 @@ class Product(db.Model):
         return self
 
     ##################################################
-    # CLASS METHODS
+    # Class Methods
     ##################################################
-
     @classmethod
     def init_db(cls, app: Flask):
         """Initializes the database session
 
         :param app: the Flask app
-        :type data: Flask
-
+        :type app: Flask
         """
         logger.info("Initializing database")
         # This is where we initialize SQLAlchemy from the Flask app
@@ -177,14 +164,13 @@ class Product(db.Model):
 
     @classmethod
     def find(cls, product_id: int):
-        """Finds a Product by it's ID
+        """Finds a Product by its ID
 
         :param product_id: the id of the Product to find
         :type product_id: int
 
         :return: an instance with the product_id, or None if not found
         :rtype: Product
-
         """
         logger.info("Processing lookup for id %s ...", product_id)
         return cls.query.get(product_id)
@@ -198,7 +184,6 @@ class Product(db.Model):
 
         :return: a collection of Products with that name
         :rtype: list
-
         """
         logger.info("Processing name query for %s ...", name)
         return cls.query.filter(cls.name == name)
@@ -208,11 +193,10 @@ class Product(db.Model):
         """Returns all Products with the given price
 
         :param price: the price to search for
-        :type name: float
+        :type price: Decimal or str
 
         :return: a collection of Products with that price
         :rtype: list
-
         """
         logger.info("Processing price query for %s ...", price)
         price_value = price
@@ -224,12 +208,11 @@ class Product(db.Model):
     def find_by_availability(cls, available: bool = True) -> list:
         """Returns all Products by their availability
 
-        :param available: True for products that are available
-        :type available: str
+        :param available: True for available products
+        :type available: bool
 
-        :return: a collection of Products that are available
+        :return: a collection of available Products
         :rtype: list
-
         """
         logger.info("Processing available query for %s ...", available)
         return cls.query.filter(cls.available == available)
@@ -238,12 +221,11 @@ class Product(db.Model):
     def find_by_category(cls, category: Category = Category.UNKNOWN) -> list:
         """Returns all Products by their Category
 
-        :param category: values are ['MALE', 'FEMALE', 'UNKNOWN']
-        :type available: enum
+        :param category: Category enum member
+        :type category: Category
 
-        :return: a collection of Products that are available
+        :return: a collection of available Products
         :rtype: list
-
         """
         logger.info("Processing category query for %s ...", category.name)
         return cls.query.filter(cls.category == category)

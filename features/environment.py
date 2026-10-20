@@ -18,6 +18,9 @@ def before_all(context):
         context.driver = get_firefox()
     else:
         context.driver = get_chrome()
+    if not hasattr(context.driver, "find_element_by_id"):
+        from selenium.webdriver.common.by import By
+        context.driver.find_element_by_id = lambda element_id: context.driver.find_element(By.ID, element_id)
     context.driver.implicitly_wait(context.wait_seconds)
     context.config.setup_logging()
 
